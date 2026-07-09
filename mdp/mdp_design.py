@@ -217,3 +217,50 @@ def define_action_space():
 if __name__ == "__main__":
     define_state_space()
     define_action_space()
+
+# ============================================================
+# FUNCTION 3: define_reward_function
+# ============================================================
+
+def define_reward_function(price, bookings_made):
+    """
+    Calculate the immediate reward for one time step.
+
+    Reward = price × bookings_made
+
+    This is the REVENUE generated in one day at a given price.
+    The agent's goal is to maximize CUMULATIVE reward across
+    the full 30-day episode — not just one day's revenue.
+
+    This creates the core tension:
+    - High price → high reward per booking, but fewer bookings
+    - Low price  → more bookings, but lower reward per booking
+    - Near deadline → must drop price to clear remaining inventory
+
+    Args:
+        price         (int): price chosen by agent (from PRICE_LEVELS)
+        bookings_made (int): number of customers who booked at that price
+
+    Returns:
+        float: revenue generated this step
+
+    Examples:
+        define_reward_function(200, 3) → 600  (3 bookings at ₹200)
+        define_reward_function(50,  8) → 400  (8 bookings at ₹50)
+        define_reward_function(250, 0) → 0    (nobody booked at ₹250)
+    """
+    reward = price * bookings_made
+
+    return float(reward)
+
+
+# Quick test
+if __name__ == "__main__":
+    print("=" * 50)
+    print("REWARD FUNCTION TEST")
+    print("=" * 50)
+    test_cases = [(200, 3), (50, 8), (250, 0), (150, 5)]
+    for price, bookings in test_cases:
+        r = define_reward_function(price, bookings)
+        print(f"Price={price}, Bookings={bookings} → Reward={r}")
+    print("=" * 50)
