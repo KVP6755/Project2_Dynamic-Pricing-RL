@@ -125,3 +125,95 @@ print("MDP Constants loaded:")
 print(f"  State space : {(MAX_INVENTORY+1) * (MAX_DAYS+1)} states")
 print(f"  Action space: {N_ACTIONS} price levels → {PRICE_LEVELS}")
 print(f"  Episode     : {TOTAL_DAYS} days, {TOTAL_INVENTORY} rooms")
+
+# ============================================================
+# FUNCTION 1: define_state_space
+# ============================================================
+
+def define_state_space():
+    """
+    Documents and validates the MDP state space.
+
+    State = [remaining_inventory, days_until_departure]
+
+    Why these two variables?
+    - remaining_inventory tells the agent HOW DESPERATE it is to sell
+      (0 rooms left = episode over, 100 rooms left = plenty of time)
+    - days_until_departure tells the agent HOW MUCH TIME it has
+      (0 days left = must sell now at any price or lose inventory)
+
+    Together they capture the full context needed to make a
+    pricing decision — this satisfies the Markov Property.
+
+    Returns:
+        dict: state space specification
+    """
+    state_spec = {
+        'variables'   : ['remaining_inventory', 'days_until_departure'],
+        'inventory'   : {'min': 0, 'max': MAX_INVENTORY, 'type': 'int'},
+        'days'        : {'min': 0, 'max': MAX_DAYS,      'type': 'int'},
+        'total_states': (MAX_INVENTORY + 1) * (MAX_DAYS + 1),
+        'start_state' : [TOTAL_INVENTORY, TOTAL_DAYS],
+        'terminal_conditions': [
+            'days_until_departure == 0',
+            'remaining_inventory == 0'
+        ]
+    }
+
+    print("=" * 50)
+    print("STATE SPACE")
+    print("=" * 50)
+    print(f"Variables      : {state_spec['variables']}")
+    print(f"Inventory range: 0 to {MAX_INVENTORY}")
+    print(f"Days range     : 0 to {MAX_DAYS}")
+    print(f"Total states   : {state_spec['total_states']}")
+    print(f"Start state    : {state_spec['start_state']}")
+    print(f"Terminal when  : {state_spec['terminal_conditions']}")
+    print("=" * 50)
+
+    return state_spec
+
+
+# ============================================================
+# FUNCTION 2: define_action_space
+# ============================================================
+
+def define_action_space():
+    """
+    Documents the MDP action space.
+
+    Action = price_level chosen by the agent at each time step.
+
+    The agent picks ONE price per day from 5 discrete options.
+    This is a simplified version of real airline/hotel pricing
+    (which can have hundreds of fare classes) but captures the
+    core trade-off: high price = more revenue per booking but
+    fewer customers; low price = more bookings but less margin.
+
+    Returns:
+        dict: action space specification
+    """
+    action_spec = {
+        'type'        : 'Discrete',
+        'n_actions'   : N_ACTIONS,
+        'price_levels': PRICE_LEVELS,
+        'min_price'   : min(PRICE_LEVELS),
+        'max_price'   : max(PRICE_LEVELS),
+        'index_map'   : {i: p for i, p in enumerate(PRICE_LEVELS)}
+    }
+
+    print("=" * 50)
+    print("ACTION SPACE")
+    print("=" * 50)
+    print(f"Type           : {action_spec['type']}")
+    print(f"Number of actions: {action_spec['n_actions']}")
+    print(f"Price options  : {action_spec['price_levels']}")
+    print(f"Index mapping  : {action_spec['index_map']}")
+    print("=" * 50)
+
+    return action_spec
+
+
+if __name__ == "__main__":
+    define_state_space()
+    define_action_space()
