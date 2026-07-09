@@ -85,3 +85,43 @@ Output:
     inside PricingEnv using Gymnasium.
 ================================================================================
 """
+
+# ============================================================
+# IMPORTS
+# ============================================================
+import numpy as np
+import pandas as pd
+
+# ============================================================
+# MDP CONSTANTS
+# ============================================================
+# These are the fixed parameters of our pricing problem.
+# Member 2 (Gym Environment) must use these exact same values
+# to ensure consistency across the full RL pipeline.
+
+# Inventory
+TOTAL_INVENTORY = 100     # total rooms/seats per season
+MAX_INVENTORY   = 100     # upper bound of state space
+
+# Time
+TOTAL_DAYS      = 30      # days in one booking season
+MAX_DAYS        = 30      # upper bound of state space
+
+# Price levels (Action space)
+# 5 discrete price options the agent can choose from
+PRICE_LEVELS = [50, 100, 150, 200, 250]
+N_ACTIONS    = len(PRICE_LEVELS)
+
+# Demand parameters
+BASE_DEMAND_RATE    = 0.8   # base probability any customer books
+PRICE_SENSITIVITY   = 0.002 # how much price reduces booking prob
+URGENCY_FACTOR      = 0.3   # how much last-minute urgency increases prob
+MAX_BOOKINGS_PER_STEP = 5   # max customers who arrive per time step
+
+# Episode
+RANDOM_STATE = 42  # reproducibility seed
+
+print("MDP Constants loaded:")
+print(f"  State space : {(MAX_INVENTORY+1) * (MAX_DAYS+1)} states")
+print(f"  Action space: {N_ACTIONS} price levels → {PRICE_LEVELS}")
+print(f"  Episode     : {TOTAL_DAYS} days, {TOTAL_INVENTORY} rooms")
