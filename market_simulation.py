@@ -79,3 +79,72 @@ class InventoryManager:
         print(f"Day          : {self.day}")
         print(f"Rooms left   : {self.rooms_left}/{self.total_rooms}")
         print(f"Occupancy    : {self.occupancy_rate()*100:.1f}%")
+
+
+# 2. Customer Demand Simulation
+
+class DemandSimulator:
+    """
+    Simulates how many customers arrive each day and
+    how many rooms they want to book.
+
+    Demand is influenced by:
+    - Base demand (average customers per day)
+    - Day of week (weekends busier)
+    - Season (peak/off-peak)
+    - Random variation (real-world unpredictability)
+    """
+
+    def __init__(self, base_demand=10, random_state=42):
+        """
+        Parameters:
+            base_demand  : average number of customer groups per day
+            random_state : seed for reproducibility
+        """
+        self.base_demand  = base_demand
+        self.rng          = np.random.RandomState(random_state)
+
+    def get_daily_demand(self, day, season='normal'):
+        """
+        Simulates customer arrivals for a given day.
+
+        Parameters:
+            day    : current day (0-29)
+            season : 'peak', 'normal', or 'off_peak'
+
+        Returns:
+            num_customers : number of customer groups arriving today
+        """
+        # Season multiplier
+        season_multiplier = {
+            'peak'    : 1.5,
+            'normal'  : 1.0,
+            'off_peak': 0.6
+        }.get(season, 1.0)
+
+        # Weekend effect (days 5,6,12,13... are weekends)
+        weekend_boost = 1.3 if (day % 7) in [5, 6] else 1.0
+
+        # Final demand with random variation
+        mean_demand = self.base_demand * season_multiplier * weekend_boost
+        num_customers = int(self.rng.poisson(mean_demand))
+
+        return max(0, num_customers)
+
+    def get_rooms_requested(self, num_customers):
+        """
+        For each customer group, randomly decide how many
+        rooms they want (1-3 rooms per group).
+
+        Parameters:
+            num_customers : number of customer groups
+
+        Returns:
+            total_rooms_requested : total rooms all customers want
+        """
+        if num_customers == 0:
+            return 0
+
+        rooms_per_group = self.rng.randint(1, 4, size=num_customers)
+        return int(rooms_per_group.sum())
+
