@@ -420,3 +420,77 @@ if __name__ == "__main__":
             )
             print(f"{price:<8} {days:<12} {prob:.3f}    {bookings}")
     print("=" * 60)
+
+# ============================================================
+# FUNCTION 5: simulate_one_step
+# ============================================================
+
+def simulate_one_step(state, action_index):
+    """
+    Simulate one MDP transition — one day of pricing decisions.
+
+    This is the core MDP loop Member 2 will implement inside
+    the Gymnasium step() method.
+
+    Flow:
+        1. Agent observes state [inventory, days]
+        2. Agent picks action (price level index)
+        3. Demand function generates stochastic bookings
+        4. Reward = price × bookings
+        5. Inventory decreases by bookings_made
+        6. Days decrease by 1
+        7. Return next_state, reward, done
+
+    Args:
+        state        (list) : [remaining_inventory, days_until_departure]
+        action_index (int)  : index 0-4 mapping to PRICE_LEVELS
+
+    Returns:
+        next_state (list) : updated [inventory, days]
+        reward     (float): revenue this step
+        done       (bool) : True if episode ended
+        info       (dict) : bookings made, price used
+    """
+    inventory, days = state
+    price           = PRICE_LEVELS[action_index]
+
+    # Simulate customer demand
+    bookings_made   = define_demand_function(price, days)
+
+    # Clip bookings to available inventory
+    bookings_made   = min(bookings_made, inventory)
+
+    # Calculate reward
+    reward          = define_reward_function(price, bookings_made)
+
+    # Update state
+    next_inventory  = inventory - bookings_made
+    next_days       = days - 1
+
+    # Check terminal condition
+    done = (next_days <= 0) or (next_inventory <= 0)
+
+    next_state = [next_inventory, next_days]
+    info       = {
+        'price'        : price,
+        'bookings_made': bookings_made,
+        'reward'       : reward
+    }
+
+    return next_state, reward, done, info
+
+
+if __name__ == "__main__":
+    print("=" * 50)
+    print("ONE STEP SIMULATION TEST")
+    print("=" * 50)
+    state = [100, 30]
+    for action_idx in range(N_ACTIONS):
+        next_state, reward, done, info = simulate_one_step(
+            state, action_idx
+        )
+        print(f"Action {action_idx} (₹{info['price']:>3}) | "
+              f"Bookings={info['bookings_made']} | "
+              f"Reward={reward:.0f} | "
+              f"Next state={next_state}")
+    print("=" * 50)
