@@ -148,3 +148,124 @@ class DemandSimulator:
         rooms_per_group = self.rng.randint(1, 4, size=num_customers)
         return int(rooms_per_group.sum())
 
+# 3. Booking Probability Logic
+def booking_probability(price, base_price=100.0, sensitivity=0.02):
+    """
+    Calculates the probability that a customer will book
+    at a given price.
+
+    Logic: higher price = lower booking probability.
+    Uses an exponential decay model.
+
+    Parameters:
+        price       : current room price being offered
+        base_price  : reference price (probability = 0.8 at base)
+        sensitivity : how sensitive customers are to price changes
+                      (higher = more price-sensitive)
+
+    Returns:
+        probability : float between 0 and 1
+    """
+    probability = 0.8 * np.exp(-sensitivity * (price - base_price))
+    return float(np.clip(probability, 0.0, 1.0))
+
+
+def will_customer_book(price, base_price=100.0,
+                       sensitivity=0.02, rng=None):
+    """
+    Randomly decides if a customer books based on
+    the booking probability at the current price.
+
+    Parameters:
+        price       : current room price
+        base_price  : reference price
+        sensitivity : price sensitivity
+        rng         : numpy RandomState for reproducibility
+
+    Returns:
+        True if customer books, False otherwise
+    """
+    prob = booking_probability(price, base_price, sensitivity)
+    if rng is None:
+        return np.random.random() < prob
+    return rng.random() < prob
+
+# 4. Revenue Calculation
+
+def calculate_revenue(rooms_booked, price):
+    """
+    Calculates revenue from a single booking event.
+
+    Parameters:
+        rooms_booked : number of rooms successfully booked
+        price        : price per room
+
+    Returns:
+        revenue : total revenue from this booking
+    """
+    return rooms_booked * price
+
+
+def run_simulation(price=100.0, total_rooms=100,
+                   total_days=30, season='normal'):
+    """
+    Runs a full 30-day market simulation at a fixed price.
+
+    Combines all components:
+    inventory + demand + booking probability + revenue
+
+    Parameters:
+        price       : room price for this simulation run
+        total_rooms : total rooms available
+        total_days  : number of days to simulate
+        season      : demand season ('peak', 'normal', 'off_peak')
+
+    Returns:
+        results_df  : daily simulation log as a DataFrame
+        total_revenue: total revenue earned over all days
+    """
+    inventory = InventoryManager(total_rooms=total_rooms,
+                                 total_days=total_days)
+    demand    = DemandSimulator(base_demand=10, random_state=42)
+
+    daily_log = []
+
+    for day in range(total_days):
+        if inventory.is_sold_out():
+            break
+
+        # How many customers arrive today
+        num_customers = demand.get_daily_demand(day, season=season)
+
+        # How many rooms they want
+        rooms_requested = demand.get_rooms_requested(num_customers)
+
+        # How many actually decide to book at this price
+        actual_bookers = sum(
+            will_customer_book(price, rng=demand.rng)
+            for _ in range(num_customers)
+        )
+
+        # Rooms successfully booked
+        rooms_to_book = min(rooms_requested, actual_bookers)
+        rooms_booked  = inventory.book_rooms(rooms_to_book)
+
+        # Revenue from today
+        revenue = calculate_revenue(rooms_booked, price)
+
+        daily_log.append({
+            'day'            : day + 1,
+            'customers'      : num_customers,
+            'rooms_requested': rooms_requested,
+            'rooms_booked'   : rooms_booked,
+            'rooms_left'     : inventory.rooms_left,
+            'price'          : price,
+            'revenue'        : revenue
+        })
+
+        inventory.advance_day()
+
+    results_df    = pd.DataFrame(daily_log)
+    total_revenue = results_df['revenue'].sum()
+
+    return results_df, total_revenue
