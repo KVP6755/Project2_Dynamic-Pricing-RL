@@ -265,97 +265,6 @@ if __name__ == "__main__":
         print(f"Price={price}, Bookings={bookings} → Reward={r}")
     print("=" * 50)
 
-# ============================================================
-# FUNCTION 6: simulate_episode
-# ============================================================
-
-def simulate_episode(policy='random', verbose=False):
-    """
-    Run one complete 30-day booking season.
-
-    This simulates a full episode from start state [100, 30]
-    to terminal state (days=0 or inventory=0).
-
-    Used to:
-    - Verify the MDP structure works end to end
-    - Generate baseline episode statistics
-    - Give Member 2 a reference for their Gym environment output
-
-    Args:
-        policy  (str) : 'random' (random actions) or
-                        'fixed_high' (always ₹250) or
-                        'fixed_low'  (always ₹50)
-        verbose (bool): print step-by-step details
-
-    Returns:
-        dict: episode summary with total_revenue, rooms_sold,
-              steps_taken, final_state
-    """
-    state          = [TOTAL_INVENTORY, TOTAL_DAYS]
-    total_revenue  = 0
-    rooms_sold     = 0
-    step           = 0
-
-    if verbose:
-        print(f"\n{'Step':<6}{'State':<20}"
-              f"{'Price':<8}{'Books':<8}{'Reward':<10}")
-        print("-" * 55)
-
-    while True:
-        # Select action based on policy
-        if policy == 'random':
-            action_idx = np.random.randint(0, N_ACTIONS)
-        elif policy == 'fixed_high':
-            action_idx = N_ACTIONS - 1   # always ₹250
-        elif policy == 'fixed_low':
-            action_idx = 0               # always ₹50
-        else:
-            action_idx = np.random.randint(0, N_ACTIONS)
-
-        next_state, reward, done, info = simulate_one_step(
-            state, action_idx
-        )
-
-        total_revenue += reward
-        rooms_sold    += info['bookings_made']
-        step          += 1
-
-        if verbose:
-            print(f"{step:<6}{str(state):<20}"
-                  f"{info['price']:<8}"
-                  f"{info['bookings_made']:<8}"
-                  f"{reward:<10.0f}")
-
-        state = next_state
-
-        if done:
-            break
-
-    summary = {
-        'policy'       : policy,
-        'total_revenue': total_revenue,
-        'rooms_sold'   : rooms_sold,
-        'rooms_unsold' : state[0],
-        'steps_taken'  : step,
-        'final_state'  : state
-    }
-
-    return summary
-
-
-if __name__ == "__main__":
-    np.random.seed(RANDOM_STATE)
-    print("=" * 50)
-    print("EPISODE SIMULATION TEST")
-    print("=" * 50)
-    for policy in ['random', 'fixed_high', 'fixed_low']:
-        result = simulate_episode(policy=policy)
-        print(f"\nPolicy: {policy}")
-        print(f"  Total Revenue : ₹{result['total_revenue']:.0f}")
-        print(f"  Rooms Sold    : {result['rooms_sold']}")
-        print(f"  Rooms Unsold  : {result['rooms_unsold']}")
-        print(f"  Steps Taken   : {result['steps_taken']}")
-    print("=" * 50)
 
 # ============================================================
 # FUNCTION 4: define_demand_function
@@ -493,4 +402,96 @@ if __name__ == "__main__":
               f"Bookings={info['bookings_made']} | "
               f"Reward={reward:.0f} | "
               f"Next state={next_state}")
+    print("=" * 50)
+
+# ============================================================
+# FUNCTION 6: simulate_episode
+# ============================================================
+
+def simulate_episode(policy='random', verbose=False):
+    """
+    Run one complete 30-day booking season.
+
+    This simulates a full episode from start state [100, 30]
+    to terminal state (days=0 or inventory=0).
+
+    Used to:
+    - Verify the MDP structure works end to end
+    - Generate baseline episode statistics
+    - Give Member 2 a reference for their Gym environment output
+
+    Args:
+        policy  (str) : 'random' (random actions) or
+                        'fixed_high' (always ₹250) or
+                        'fixed_low'  (always ₹50)
+        verbose (bool): print step-by-step details
+
+    Returns:
+        dict: episode summary with total_revenue, rooms_sold,
+              steps_taken, final_state
+    """
+    state          = [TOTAL_INVENTORY, TOTAL_DAYS]
+    total_revenue  = 0
+    rooms_sold     = 0
+    step           = 0
+
+    if verbose:
+        print(f"\n{'Step':<6}{'State':<20}"
+              f"{'Price':<8}{'Books':<8}{'Reward':<10}")
+        print("-" * 55)
+
+    while True:
+        # Select action based on policy
+        if policy == 'random':
+            action_idx = np.random.randint(0, N_ACTIONS)
+        elif policy == 'fixed_high':
+            action_idx = N_ACTIONS - 1   # always ₹250
+        elif policy == 'fixed_low':
+            action_idx = 0               # always ₹50
+        else:
+            action_idx = np.random.randint(0, N_ACTIONS)
+
+        next_state, reward, done, info = simulate_one_step(
+            state, action_idx
+        )
+
+        total_revenue += reward
+        rooms_sold    += info['bookings_made']
+        step          += 1
+
+        if verbose:
+            print(f"{step:<6}{str(state):<20}"
+                  f"{info['price']:<8}"
+                  f"{info['bookings_made']:<8}"
+                  f"{reward:<10.0f}")
+
+        state = next_state
+
+        if done:
+            break
+
+    summary = {
+        'policy'       : policy,
+        'total_revenue': total_revenue,
+        'rooms_sold'   : rooms_sold,
+        'rooms_unsold' : state[0],
+        'steps_taken'  : step,
+        'final_state'  : state
+    }
+
+    return summary
+
+
+if __name__ == "__main__":
+    np.random.seed(RANDOM_STATE)
+    print("=" * 50)
+    print("EPISODE SIMULATION TEST")
+    print("=" * 50)
+    for policy in ['random', 'fixed_high', 'fixed_low']:
+        result = simulate_episode(policy=policy)
+        print(f"\nPolicy: {policy}")
+        print(f"  Total Revenue : ₹{result['total_revenue']:.0f}")
+        print(f"  Rooms Sold    : {result['rooms_sold']}")
+        print(f"  Rooms Unsold  : {result['rooms_unsold']}")
+        print(f"  Steps Taken   : {result['steps_taken']}")
     print("=" * 50)
