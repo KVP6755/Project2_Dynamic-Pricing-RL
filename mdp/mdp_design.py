@@ -495,3 +495,64 @@ if __name__ == "__main__":
         print(f"  Rooms Unsold  : {result['rooms_unsold']}")
         print(f"  Steps Taken   : {result['steps_taken']}")
     print("=" * 50)
+
+# ============================================================
+# FUNCTION 7: summarize_mdp
+# ============================================================
+
+def summarize_mdp():
+    """
+    Print the complete MDP specification — the single source
+    of truth document for the whole team.
+
+    Member 2 uses this to build PricingEnv correctly.
+    Member 3 uses this to understand what to simulate.
+    Member 4 uses this to understand what baseline to beat.
+    """
+    state_spec  = define_state_space()
+    action_spec = define_action_space()
+
+    print("\n" + "=" * 60)
+    print("COMPLETE MDP SPECIFICATION — DYNAMIC PRICING")
+    print("=" * 60)
+    print(f"Problem   : Sell {TOTAL_INVENTORY} rooms/seats "
+          f"over {TOTAL_DAYS} days")
+    print(f"Goal      : Maximize total revenue per episode")
+    print()
+    print("STATE:")
+    print(f"  [remaining_inventory (0-{MAX_INVENTORY}), "
+          f"days_until_departure (0-{MAX_DAYS})]")
+    print(f"  Total states: {state_spec['total_states']}")
+    print()
+    print("ACTION:")
+    print(f"  Price levels: {action_spec['price_levels']}")
+    print(f"  Total actions: {action_spec['n_actions']}")
+    print()
+    print("REWARD:")
+    print("  reward = price × bookings_made")
+    print("  Cumulative reward = total season revenue")
+    print()
+    print("TRANSITION:")
+    print("  next_inventory = current_inventory - bookings_made")
+    print("  next_days      = current_days - 1")
+    print()
+    print("TERMINAL:")
+    print("  days_until_departure == 0  (season ended)")
+    print("  remaining_inventory  == 0  (sold out)")
+    print()
+    print("DEMAND FUNCTION:")
+    print(f"  P(book) = {BASE_DEMAND_RATE} "
+          f"- {PRICE_SENSITIVITY} × price "
+          f"+ {URGENCY_FACTOR} × (1/days)")
+    print("  Bookings ~ Binomial(5, P(book))")
+    print("=" * 60)
+
+
+if __name__ == "__main__":
+    np.random.seed(RANDOM_STATE)
+    summarize_mdp()
+    print("\nRunning 3 episode policies for baseline reference:")
+    for policy in ['random', 'fixed_high', 'fixed_low']:
+        r = simulate_episode(policy=policy)
+        print(f"  {policy:<12}: ₹{r['total_revenue']:.0f} revenue, "
+              f"{r['rooms_sold']} rooms sold")
