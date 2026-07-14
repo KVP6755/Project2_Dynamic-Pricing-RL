@@ -269,3 +269,73 @@ def run_simulation(price=100.0, total_rooms=100,
     total_revenue = results_df['revenue'].sum()
 
     return results_df, total_revenue
+
+
+
+# 5. Visualizations
+def plot_simulation_results(results_df, title="Market Simulation"):
+    """
+    Plots daily bookings, inventory, and revenue
+    from a simulation run.
+    """
+    fig, axes = plt.subplots(3, 1, figsize=(10, 10))
+
+    # Plot 1: Daily bookings
+    axes[0].bar(results_df['day'], results_df['rooms_booked'],
+                color='steelblue')
+    axes[0].set_title('Daily Rooms Booked')
+    axes[0].set_xlabel('Day')
+    axes[0].set_ylabel('Rooms Booked')
+    axes[0].grid(True, alpha=0.3)
+
+    # Plot 2: Inventory remaining
+    axes[1].plot(results_df['day'], results_df['rooms_left'],
+                 color='orange', linewidth=2)
+    axes[1].set_title('Rooms Remaining Over Time')
+    axes[1].set_xlabel('Day')
+    axes[1].set_ylabel('Rooms Left')
+    axes[1].grid(True, alpha=0.3)
+
+    # Plot 3: Daily revenue
+    axes[2].bar(results_df['day'], results_df['revenue'],
+                color='green', alpha=0.7)
+    axes[2].set_title('Daily Revenue')
+    axes[2].set_xlabel('Day')
+    axes[2].set_ylabel('Revenue ($)')
+    axes[2].grid(True, alpha=0.3)
+
+    plt.suptitle(title, fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    plt.savefig('simulation_results.png')
+    plt.show()
+
+
+# 6. Run and test
+
+if __name__ == "__main__":
+
+    print("=" * 50)
+    print("MARKET SIMULATION TEST")
+    print("=" * 50)
+
+    # Test booking probability
+    print("\nBooking probability at different prices:")
+    for price in [70, 100, 130, 160]:
+        prob = booking_probability(price)
+        print(f"  Price ${price}: {prob:.2f} probability of booking")
+
+    # Run full simulation
+    print("\nRunning 30-day simulation at $100/room...")
+    results, revenue = run_simulation(price=100.0, season='normal')
+
+    print(f"\nTotal revenue    : ${revenue:,.2f}")
+    print(f"Total rooms booked: {results['rooms_booked'].sum()}")
+    print(f"Days simulated   : {len(results)}")
+    print("\nFirst 5 days:")
+    print(results.head().to_string(index=False))
+
+    # Plot results
+    plot_simulation_results(results, title="Market Simulation — $100/room")
+
+    print("\n✓ Market simulation complete.")
+    print("  market_simulation.py ready to plug into PricingEnv")
