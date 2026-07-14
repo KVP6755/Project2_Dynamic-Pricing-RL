@@ -21,6 +21,19 @@ import numpy as np
 
 class PricingEnv(gym.Env):
 
+    """
+    Custom Gymnasium environment for dynamic pricing.
+
+    State:
+        [remaining_inventory, days_left]
+
+    Actions:
+        Select one of the predefined price levels.
+
+    Reward:
+        Revenue earned from bookings.
+    """
+
     def __init__(self):
         super().__init__()
 
@@ -49,6 +62,14 @@ class PricingEnv(gym.Env):
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
+        """
+        Reset the environment to its initial state.
+
+        Returns:
+            state (numpy.ndarray): Initial state.
+            info (dict): Additional information.
+        """
+
         self.inventory = self.max_inventory
         self.days_left = self.max_days
 
@@ -67,6 +88,16 @@ class PricingEnv(gym.Env):
     # Step
     # --------------------
     def step(self, action):
+
+        """
+        Execute one action in the environment.
+
+        Args:
+            action (int): Index of the selected price level.
+
+        Returns:
+            next_state, reward, terminated, truncated, info
+        """
 
         print("\n===== STEP FUNCTION CALLED =====")
 
@@ -113,66 +144,31 @@ class PricingEnv(gym.Env):
     # --------------------
     def render(self):
 
+        """
+        Display the current environment state.
+        """
+
         print("\n===== Current Environment =====")
         print(f"Remaining Inventory : {self.inventory}")
         print(f"Days Left           : {self.days_left}")
 
-# -----------------------------------
-# Testing the Pricing Environment
-# -----------------------------------
 
-if __name__ == "__main__":
 
-    # Create Environment
-    env = PricingEnv()
 
-    print("===================================")
-    print("   PRICING ENVIRONMENT TEST")
-    print("===================================\n")
 
-    # Test Reset
-    state, info = env.reset()
+    # --------------------
+    # Close Environment
+    
+    # --------------------
+    def close(self):
 
-    print("1. Reset Function")
-    print("-----------------")
-    print("Initial State :", state)
-    print("Info :", info)
-    print()
+        """
+        Close the environment.
+        """
+        
+        print("\nClosing Pricing Environment...")
 
-    # Test Action Space
-    print("2. Action Space")
-    print("-----------------")
-    print("Available Price Levels :", env.price_levels)
-    print("Number of Actions :", env.action_space.n)
-    print()
 
-    # Test Observation Space
-    print("3. Observation Space")
-    print("-----------------")
-    print(env.observation_space)
-    print()
 
-    # Test Step Function
-    print("4. Step Function")
-    print("-----------------")
 
-    action = 2   # Price = 5000
 
-    next_state, reward, terminated, truncated, info = env.step(action)
-
-    print("\nReturned Values")
-    print("Next State :", next_state)
-    print("Reward :", reward)
-    print("Terminated :", terminated)
-    print("Truncated :", truncated)
-    print("Info :", info)
-    print()
-
-    # Test Render
-    print("5. Render Function")
-    print("-----------------")
-    env.render()
-
-    print("\n===================================")
-    print("Environment Test Completed Successfully")
-    print("===================================")
