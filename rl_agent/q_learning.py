@@ -59,24 +59,89 @@ class QLearningAgent:
         )
 
 
+
+# --------------------------------------------------------
+# Choose an action using the Epsilon-Greedy Policy
+# --------------------------------------------------------
+    def choose_action(self, state):
+
+        # Get inventory and days left from the current state
+        inventory, days_left = state
+
+        # Generate a random number between 0 and 1
+        random_number = random.uniform(0, 1)
+
+        # Exploration: choose a random action
+        if random_number < self.epsilon:
+
+            action = self.env.action_space.sample()
+
+            print("\n===== Exploration =====")
+            print("Random Number :", random_number)
+            print("Random Action Selected :", action)
+            print("Selected Price :", self.env.price_levels[action])
+
+        # Exploitation: choose the best action from the Q-table
+        else:
+
+            action = np.argmax(
+                self.q_table[inventory, days_left]
+            )
+
+            print("\n===== Exploitation =====")
+            print("Random Number :", random_number)
+            print("Best Action Selected :", action)
+            print("Selected Price :", self.env.price_levels[action])
+
+        return action
+
+
+
+
 if __name__ == "__main__":
 
+    # Create Q-Learning Agent
     agent = QLearningAgent()
 
-    print("=" * 40)
-    print("Q-Learning Agent Initialized")
-    print("=" * 40)
+    print("=" * 45)
+    print("      Q-LEARNING AGENT TEST")
+    print("=" * 45)
 
-    print(f"State Size  : {agent.state_size}")
-    print(f"Action Size : {agent.action_size}")
-    print(f"Learning Rate : {agent.learning_rate}")
-    print(f"Discount Factor : {agent.discount_factor}")
-    print(f"Epsilon : {agent.epsilon}")
+    # Agent Information
+    print("\n1. Agent Initialization")
+    print("-" * 30)
+    print(f"State Size        : {agent.state_size}")
+    print(f"Action Size       : {agent.action_size}")
+    print(f"Learning Rate     : {agent.learning_rate}")
+    print(f"Discount Factor   : {agent.discount_factor}")
+    print(f"Epsilon           : {agent.epsilon}")
+    print(f"Q-Table Shape     : {agent.q_table.shape}")
 
-    print("\nQ-Table Shape :", agent.q_table.shape)
+    # Reset Environment
+    print("\n2. Environment Reset")
+    print("-" * 30)
+    state, info = agent.env.reset()
+
+    print("Current State :", state)
+    print("Inventory     :", state[0])
+    print("Days Left     :", state[1])
+
+    # Test Epsilon-Greedy Policy
+    print("\n3. Epsilon-Greedy Action Selection")
+    print("-" * 30)
+
+    action = agent.choose_action(state)
+
+    print("\nReturned Action :", action)
+    print("Selected Price  :", agent.env.price_levels[action])
+
+    print("\n" + "=" * 45)
+    print("Q-Learning Agent Tested Successfully")
+    print("=" * 45)
 
 
 
-    #git add .
-#git commit -m "Initialize Q-Learning agent with environment and Q-table"
-#git push origin Shilpa
+
+
+
+    
