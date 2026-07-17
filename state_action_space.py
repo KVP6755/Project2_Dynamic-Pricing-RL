@@ -108,3 +108,85 @@ print(f"  Total states  : {TOTAL_STATES}")
 print(f"  Total actions : {N_ACTIONS}")
 print(f"  Q-Table shape : {Q_TABLE_SHAPE}")
 print(f"  Q-Table size  : {TOTAL_STATES * N_ACTIONS} values")
+
+# ============================================================
+# FUNCTION 1: encode_state
+# ============================================================
+
+def encode_state(inventory, days):
+    """
+    Convert 2D state [inventory, days] to single integer index.
+
+    This is the CORE function of this file. Q-Learning needs a
+    single integer to index into the Q-table row. Since our state
+    has two dimensions, we flatten it using this formula:
+
+        index = inventory × (MAX_DAYS + 1) + days
+
+    Why this formula?
+        Think of it like converting row/column to a flat array index.
+        Each inventory level "owns" (MAX_DAYS + 1) = 31 indices —
+        one for each possible day count.
+
+        inventory=0, days=0  → 0  × 31 + 0  = 0
+        inventory=0, days=30 → 0  × 31 + 30 = 30
+        inventory=1, days=0  → 1  × 31 + 0  = 31
+        inventory=100, days=30 → 100 × 31 + 30 = 3130
+
+    Args:
+        inventory (int): remaining inventory (0 to 100)
+        days      (int): days until departure (0 to 30)
+
+    Returns:
+        int: unique state index (0 to 3130)
+    """
+    return int(inventory * (MAX_DAYS + 1) + days)
+
+
+# ============================================================
+# FUNCTION 2: decode_state
+# ============================================================
+
+def decode_state(index):
+    """
+    Convert single integer index back to [inventory, days].
+
+    Reverse of encode_state() — used for debugging and logging
+    to show human-readable state from Q-table index.
+
+    Args:
+        index (int): state index (0 to 3130)
+
+    Returns:
+        tuple: (inventory, days)
+    """
+    inventory = index // (MAX_DAYS + 1)
+    days      = index  % (MAX_DAYS + 1)
+    return int(inventory), int(days)
+
+
+if __name__ == "__main__":
+    print("=" * 55)
+    print("STATE ENCODING VERIFICATION")
+    print("=" * 55)
+    test_states = [
+        [100, 30],   # start state
+        [50,  15],   # mid episode
+        [0,   0],    # terminal state
+        [1,   1],
+        [99,  29]
+    ]
+    print(f"{'State':<15} {'Index':<8} {'Decoded':<15} {'Match'}")
+    print("-" * 55)
+    for inv, d in test_states:
+        idx       = encode_state(inv, d)
+        inv2, d2  = decode_state(idx)
+        match     = "✓" if (inv == inv2 and d == d2) else "✗"
+        print(f"[{inv}, {d}]"
+              f"{'':>{13-len(str(inv))-len(str(d))}}"
+              f"{idx:<8} [{inv2}, {d2}]"
+              f"{'':>{12-len(str(inv2))-len(str(d2))}}"
+              f"{match}")
+    print("=" * 55)
+    print(f"Start state    [100, 30] → index: {encode_state(100, 30)}")
+    print(f"Terminal state [0, 0]    → index: {encode_state(0, 0)}")
