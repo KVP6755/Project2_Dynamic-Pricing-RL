@@ -268,3 +268,80 @@ if __name__ == "__main__":
         match      = "✓" if price == price_back else "✗"
         print(f"{i:<8} ₹{price:<7} {match}")
     print("=" * 45)
+
+# ============================================================
+# FUNCTION 5: validate_state
+# ============================================================
+
+def validate_state(inventory, days):
+    """
+    Check if a state [inventory, days] is within valid bounds.
+
+    Used as a safety check in the Q-Learning training loop to
+    catch invalid states before they cause IndexError on Q-table.
+
+    Args:
+        inventory (int): remaining inventory
+        days      (int): days remaining
+
+    Returns:
+        bool: True if valid, False if out of bounds
+
+    Example:
+        validate_state(50, 15) → True
+        validate_state(-1, 15) → False  (negative inventory)
+        validate_state(50, 35) → False  (days > MAX_DAYS)
+    """
+    valid = (
+        0 <= inventory <= MAX_INVENTORY and
+        0 <= days      <= MAX_DAYS
+    )
+
+    if not valid:
+        print(f"Invalid state: inventory={inventory}, days={days}")
+        print(f"  inventory must be 0 to {MAX_INVENTORY}")
+        print(f"  days must be 0 to {MAX_DAYS}")
+
+    return valid
+
+
+# ============================================================
+# FUNCTION 6: validate_action
+# ============================================================
+
+def validate_action(action_index):
+    """
+    Check if an action index is within valid range.
+
+    Args:
+        action_index (int): index to validate
+
+    Returns:
+        bool: True if valid, False if out of range
+    """
+    valid = 0 <= action_index < N_ACTIONS
+
+    if not valid:
+        print(f"Invalid action: {action_index}")
+        print(f"  Must be 0 to {N_ACTIONS - 1}")
+
+    return valid
+
+
+if __name__ == "__main__":
+    print("=" * 45)
+    print("VALIDATION TESTS")
+    print("=" * 45)
+    print("State validation:")
+    tests = [(50, 15, True), (100, 30, True),
+             (-1, 15, False), (50, 35, False), (101, 10, False)]
+    for inv, d, expected in tests:
+        result = validate_state(inv, d)
+        match  = "✓" if result == expected else "✗"
+        print(f"  [{inv}, {d}] → {result} {match}")
+
+    print("\nAction validation:")
+    for a, expected in [(0, True),(4, True),(5, False),(-1, False)]:
+        result = validate_action(a)
+        match  = "✓" if result == expected else "✗"
+        print(f"  action={a} → {result} {match}")
