@@ -78,3 +78,33 @@ Handoff to Member 2 (Q-Learning Agent):
 ================================================================================
 """
 
+# ============================================================
+# IMPORTS
+# ============================================================
+import numpy as np
+
+# ============================================================
+# CONSTANTS
+# ============================================================
+# Importing from Week 1 MDP design — these MUST stay consistent
+# across all team members' files
+
+# State space bounds
+MAX_INVENTORY  = 100
+MAX_DAYS       = 30
+TOTAL_INVENTORY = 100
+TOTAL_DAYS      = 30
+
+# Action space — price levels
+PRICE_LEVELS = [50, 100, 150, 200, 250]
+N_ACTIONS    = len(PRICE_LEVELS)
+
+# Derived constants (computed, not hardcoded)
+TOTAL_STATES  = (MAX_INVENTORY + 1) * (MAX_DAYS + 1)  # 3131
+Q_TABLE_SHAPE = (TOTAL_STATES, N_ACTIONS)              # (3131, 5)
+
+print("State & Action Space constants loaded:")
+print(f"  Total states  : {TOTAL_STATES}")
+print(f"  Total actions : {N_ACTIONS}")
+print(f"  Q-Table shape : {Q_TABLE_SHAPE}")
+print(f"  Q-Table size  : {TOTAL_STATES * N_ACTIONS} values")
