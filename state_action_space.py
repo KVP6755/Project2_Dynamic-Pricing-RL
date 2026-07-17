@@ -190,3 +190,81 @@ if __name__ == "__main__":
     print("=" * 55)
     print(f"Start state    [100, 30] → index: {encode_state(100, 30)}")
     print(f"Terminal state [0, 0]    → index: {encode_state(0, 0)}")
+
+# ============================================================
+# FUNCTION 3: get_action_index
+# ============================================================
+
+def get_action_index(price):
+    """
+    Convert a price value to its action index.
+
+    Q-Learning works with integer indices [0,1,2,3,4], not
+    price values. This function translates cleanly between them.
+
+    Args:
+        price (int): price value from PRICE_LEVELS
+
+    Returns:
+        int: action index (0 to 4)
+
+    Raises:
+        ValueError: if price not in PRICE_LEVELS
+
+    Example:
+        get_action_index(50)  → 0
+        get_action_index(150) → 2
+        get_action_index(250) → 4
+    """
+    if price not in PRICE_LEVELS:
+        raise ValueError(
+            f"Price {price} not in PRICE_LEVELS {PRICE_LEVELS}"
+        )
+    return PRICE_LEVELS.index(price)
+
+
+# ============================================================
+# FUNCTION 4: get_price_from_index
+# ============================================================
+
+def get_price_from_index(action_index):
+    """
+    Convert action index to its price value.
+
+    Reverse of get_action_index(). Used by Q-Learning agent
+    when it needs to take a price action based on Q-table output.
+
+    Args:
+        action_index (int): index 0 to 4
+
+    Returns:
+        int: price value
+
+    Raises:
+        ValueError: if index out of range
+
+    Example:
+        get_price_from_index(0) → 50
+        get_price_from_index(2) → 150
+        get_price_from_index(4) → 250
+    """
+    if action_index < 0 or action_index >= N_ACTIONS:
+        raise ValueError(
+            f"action_index {action_index} out of range "
+            f"[0, {N_ACTIONS-1}]"
+        )
+    return PRICE_LEVELS[action_index]
+
+
+if __name__ == "__main__":
+    print("=" * 45)
+    print("ACTION SPACE ENCODING VERIFICATION")
+    print("=" * 45)
+    print(f"{'Index':<8} {'Price':<8} {'Round-trip'}")
+    print("-" * 45)
+    for i, price in enumerate(PRICE_LEVELS):
+        idx        = get_action_index(price)
+        price_back = get_price_from_index(idx)
+        match      = "✓" if price == price_back else "✗"
+        print(f"{i:<8} ₹{price:<7} {match}")
+    print("=" * 45)
