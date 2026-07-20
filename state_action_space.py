@@ -485,3 +485,68 @@ def get_action_space_info():
     print("=" * 55)
 
     return info
+
+# ============================================================
+# MAIN — Full test and handoff demo
+# ============================================================
+
+if __name__ == "__main__":
+
+    print("\n>>> RUNNING FULL STATE & ACTION SPACE TEST\n")
+
+    # 1. State space info
+    state_info  = get_state_space_info()
+
+    # 2. Action space info
+    action_info = get_action_space_info()
+
+    # 3. Encoding verification
+    print("\n" + "=" * 55)
+    print("ENCODING ROUND-TRIP VERIFICATION")
+    print("=" * 55)
+    test_states = [[100, 30], [50, 15], [0, 0], [1, 1], [99, 29]]
+    for inv, d in test_states:
+        idx      = encode_state(inv, d)
+        inv2, d2 = decode_state(idx)
+        match    = "✓" if (inv == inv2 and d == d2) else "✗"
+        print(f"  [{inv}, {d}] → {idx} → [{inv2}, {d2}] {match}")
+
+    # 4. Action encoding
+    print("\n" + "=" * 55)
+    print("ACTION ENCODING VERIFICATION")
+    print("=" * 55)
+    for i, price in enumerate(PRICE_LEVELS):
+        idx        = get_action_index(price)
+        price_back = get_price_from_index(idx)
+        match      = "✓" if price == price_back else "✗"
+        print(f"  ₹{price} → index {idx} → ₹{price_back} {match}")
+
+    # 5. Q-table initialization
+    Q = initialize_q_table()
+
+    # 6. Sample Q-table access (for Member 2 reference)
+    print("\n>>> SAMPLE Q-TABLE ACCESS PATTERN (for Member 2)")
+    print("─" * 55)
+    sample = [(100, 30, 150), (50, 15, 100), (10, 5, 50)]
+    for inv, d, price in sample:
+        s_idx = encode_state(inv, d)
+        a_idx = get_action_index(price)
+        print(f"  State [{inv},{d}] + Price ₹{price}"
+              f" → Q[{s_idx}][{a_idx}] = {Q[s_idx][a_idx]}")
+
+    # 7. Validation tests
+    print("\n>>> VALIDATION CHECKS")
+    print("─" * 55)
+    print(f"  Valid state   [50,15]  : {validate_state(50, 15)}")
+    print(f"  Invalid state [-1,15]  : {validate_state(-1, 15)}")
+    print(f"  Valid action  [2]      : {validate_action(2)}")
+    print(f"  Invalid action [9]     : {validate_action(9)}")
+
+    print("\n>>>(Q-Learning Agent)")
+    print("─" * 55)
+    print("  from state_action_space import (")
+    print("      encode_state, decode_state,")
+    print("      get_price_from_index, get_action_index,")
+    print("      initialize_q_table, validate_state,")
+    print("      TOTAL_STATES, N_ACTIONS, PRICE_LEVELS")
+    print("  )")
