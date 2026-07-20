@@ -406,3 +406,82 @@ if __name__ == "__main__":
     print(f"  State  : [{inv}, {days}] → index {state_idx}")
     print(f"  Action : ₹150 → index {action_idx}")
     print(f"  Q-value: {Q[state_idx][action_idx]}")
+
+# ============================================================
+# FUNCTION 8: get_state_space_info
+# ============================================================
+
+def get_state_space_info():
+    """
+    Print a complete summary of the state space.
+
+    Used for documentation and team review. Shows the full
+    mathematical specification of the state space.
+
+    Returns:
+        dict: state space specification
+    """
+    info = {
+        'dimensions'   : 2,
+        'variables'    : ['remaining_inventory', 'days_until_departure'],
+        'inventory'    : {'min': 0, 'max': MAX_INVENTORY},
+        'days'         : {'min': 0, 'max': MAX_DAYS},
+        'total_states' : TOTAL_STATES,
+        'start_state'  : [TOTAL_INVENTORY, TOTAL_DAYS],
+        'start_index'  : encode_state(TOTAL_INVENTORY, TOTAL_DAYS),
+        'terminal_conditions': [
+            'days_until_departure == 0',
+            'remaining_inventory  == 0'
+        ],
+        'encoding_formula': 'index = inventory × 31 + days'
+    }
+
+    print("\n" + "=" * 55)
+    print("STATE SPACE SPECIFICATION")
+    print("=" * 55)
+    print(f"Dimensions     : {info['dimensions']}D → encoded to 1D")
+    print(f"Variables      : {info['variables']}")
+    print(f"Inventory      : 0 to {info['inventory']['max']}")
+    print(f"Days           : 0 to {info['days']['max']}")
+    print(f"Total states   : {info['total_states']}")
+    print(f"Start state    : {info['start_state']} "
+          f"→ index {info['start_index']}")
+    print(f"Terminal when  : {info['terminal_conditions']}")
+    print(f"Encoding       : {info['encoding_formula']}")
+    print("=" * 55)
+
+    return info
+
+
+# ============================================================
+# FUNCTION 9: get_action_space_info
+# ============================================================
+
+def get_action_space_info():
+    """
+    Print a complete summary of the action space.
+
+    Returns:
+        dict: action space specification
+    """
+    info = {
+        'type'         : 'Discrete',
+        'n_actions'    : N_ACTIONS,
+        'price_levels' : PRICE_LEVELS,
+        'index_map'    : {i: p for i, p in enumerate(PRICE_LEVELS)},
+        'min_price'    : min(PRICE_LEVELS),
+        'max_price'    : max(PRICE_LEVELS)
+    }
+
+    print("\n" + "=" * 55)
+    print("ACTION SPACE SPECIFICATION")
+    print("=" * 55)
+    print(f"Type           : {info['type']}")
+    print(f"Total actions  : {info['n_actions']}")
+    print(f"Price levels   : {info['price_levels']}")
+    print(f"Index mapping  :")
+    for idx, price in info['index_map'].items():
+        print(f"    {idx} → ₹{price}")
+    print("=" * 55)
+
+    return info
