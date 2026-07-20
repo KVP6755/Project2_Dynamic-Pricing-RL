@@ -121,3 +121,53 @@ def run_episode(agent, episode_num, training=True):
 
     return episode_reward, episode_history
 
+# 4. Full Training Loop
+def train_agent(agent, total_episodes=TOTAL_EPISODES):
+    """
+    Runs the full training loop across multiple episodes.
+
+    Parameters:
+        agent          : QLearningAgent from Member 2
+        total_episodes : number of training episodes
+
+    Returns:
+        training_history : DataFrame with per-episode results
+        all_step_logs    : DataFrame with per-day step details
+    """
+    episode_rewards = []
+    all_step_logs   = []
+
+    print("=" * 50)
+    print(f"STARTING TRAINING: {total_episodes} episodes")
+    print("=" * 50)
+
+    for episode in range(total_episodes):
+        episode_reward, episode_history = run_episode(
+            agent, episode_num=episode, training=True
+        )
+
+        episode_rewards.append(episode_reward)
+        all_step_logs.extend(episode_history)
+
+        # Print progress every 50 episodes
+        if (episode + 1) % 50 == 0:
+            avg_reward = np.mean(episode_rewards[-50:])
+            print(f"Episode {episode+1:4d}/{total_episodes} | "
+                  f"Reward: {episode_reward:8.2f} | "
+                  f"Avg(last 50): {avg_reward:8.2f} | "
+                  f"Epsilon: {agent.epsilon:.3f}")
+
+    print("\n✓ Training complete.")
+
+    # Build summary DataFrame
+    training_history = pd.DataFrame({
+        'episode'          : range(total_episodes),
+        'total_reward'     : episode_rewards,
+        'cumulative_reward': np.cumsum(episode_rewards),
+        'avg_reward_50'    : pd.Series(episode_rewards)
+                             .rolling(50, min_periods=1).mean()
+    })
+
+    all_step_logs_df = pd.DataFrame(all_step_logs)
+
+    return training_history, all_step_logs_df
