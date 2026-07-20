@@ -33,3 +33,63 @@
 - Random pricing: ~₹3,200 revenue
 - Fixed ₹250 (high): ~₹1,500 revenue
 - Fixed ₹50 (low): ~₹2,000 revenue
+
+
+---
+
+## Week 2 Contributions — State & Action Space Design
+
+### File Owned
+`state_action_space.py`
+
+### Responsibility
+Translate the Week 1 MDP design into exact mathematical
+structures Q-Learning requires — state encoding, action
+encoding, Q-table initialization, and validation utilities.
+
+### Why State Encoding is Needed
+Q-Learning uses a Q-table indexed by integers. Our state is
+2D: [inventory (0-100), days (0-30)]. We encode it to a
+single integer:
+
+`index = inventory × 31 + days`
+
+This maps all 3,131 unique states to indices 0-3130.
+
+### Functions Built
+| Function | Purpose |
+|---|---|
+| `encode_state()` | [inventory, days] → single Q-table index |
+| `decode_state()` | Q-table index → [inventory, days] |
+| `get_action_index()` | Price value → action index |
+| `get_price_from_index()` | Action index → price value |
+| `validate_state()` | Bounds check before Q-table access |
+| `validate_action()` | Range check on action index |
+| `initialize_q_table()` | Creates (3131, 5) zero Q-table |
+| `get_state_space_info()` | Full state space summary |
+| `get_action_space_info()` | Full action space summary |
+
+### Q-Table Specification
+| Property | Value |
+|---|---|
+| Shape | (3131, 5) |
+| Rows | State indices (0 to 3130) |
+| Columns | Action indices (0 to 4) |
+| Values | Q-values, init = 0.0 |
+| Memory | 122.30 KB |
+
+### Encoding Verification
+| State | Index | Decoded | Match |
+|---|---|---|---|
+| [100, 30] | 3130 | [100, 30] | ✓ |
+| [50, 15] | 1565 | [50, 15] | ✓ |
+| [0, 0] | 0 | [0, 0] | ✓ |
+
+### Handoff to Member 2
+```python
+from state_action_space import (
+    encode_state, decode_state,
+    get_price_from_index, initialize_q_table,
+    TOTAL_STATES, N_ACTIONS
+)
+```
