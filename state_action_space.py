@@ -345,3 +345,64 @@ if __name__ == "__main__":
         result = validate_action(a)
         match  = "✓" if result == expected else "✗"
         print(f"  action={a} → {result} {match}")
+
+
+# ============================================================
+# FUNCTION 7: initialize_q_table
+# ============================================================
+
+def initialize_q_table(init_value=0.0):
+    """
+    Create and return a zero-initialized Q-table.
+
+    The Q-table is the core data structure of Q-Learning:
+        Q[state_index][action_index] = expected_cumulative_reward
+
+    Shape: (3131, 5) — 3131 states × 5 price actions
+
+    Why initialize to 0?
+        Starting at 0 is the standard approach — it means the agent
+        initially assumes every (state, action) pair gives 0 reward,
+        then updates values as it explores and gains experience.
+
+        Alternative: initialize to a small positive value (optimistic
+        initialization) to encourage early exploration — but 0 is
+        simpler and works well for this problem.
+
+    Args:
+        init_value (float): initial Q-value (default 0.0)
+
+    Returns:
+        np.ndarray: Q-table of shape (3131, 5)
+
+    Usage (Member 2):
+        Q = initialize_q_table()
+        q_value = Q[encode_state(50, 15)][get_action_index(150)]
+        Q[encode_state(50, 15)][2] = 750.0  # after update
+    """
+    Q = np.full(Q_TABLE_SHAPE, fill_value=init_value, dtype=np.float64)
+
+    print("=" * 50)
+    print("Q-TABLE INITIALIZED")
+    print("=" * 50)
+    print(f"Shape         : {Q.shape}")
+    print(f"Total values  : {Q.size}")
+    print(f"Initial value : {init_value}")
+    print(f"Memory usage  : {Q.nbytes / 1024:.2f} KB")
+    print(f"dtype         : {Q.dtype}")
+    print("=" * 50)
+
+    return Q
+
+
+if __name__ == "__main__":
+    Q = initialize_q_table()
+
+    # Show a sample lookup
+    inv, days = 100, 30
+    state_idx  = encode_state(inv, days)
+    action_idx = get_action_index(150)
+    print(f"\nSample Q-table lookup:")
+    print(f"  State  : [{inv}, {days}] → index {state_idx}")
+    print(f"  Action : ₹150 → index {action_idx}")
+    print(f"  Q-value: {Q[state_idx][action_idx]}")
