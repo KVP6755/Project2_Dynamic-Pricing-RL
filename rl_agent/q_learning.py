@@ -34,6 +34,8 @@ class QLearningAgent:
         # Create Pricing Environment
         self.env = PricingEnv()
 
+        
+
         # Learning Parameters
         self.learning_rate = 0.1    #Controls how quickly the agent updates its knowledge.
         self.discount_factor = 0.95  #Determines how much future rewards matter.
@@ -58,6 +60,8 @@ class QLearningAgent:
             )
         )
 
+        # Store rewards of each episode
+        self.reward_history = []
 
 
 # --------------------------------------------------------
@@ -95,8 +99,135 @@ class QLearningAgent:
 
         return action
 
+# --------------------------------------------------------
+# Update Q-Table using the Q-Learning Equation
+# --------------------------------------------------------
+    def update_q_table(
+        self,
+        state,
+        action,
+        reward,
+        next_state,
+        terminated
+    ):
+
+        # Get current state
+        inventory, days_left = state
+
+        # Get next state
+        next_inventory, next_days_left = next_state
+
+        # Current Q-Value
+        current_q = self.q_table[
+            inventory,
+            days_left,
+            action
+        ]
+
+        # Maximum Future Q-Value
+        if terminated:
+            max_future_q = 0
+        else:
+            max_future_q = np.max(
+                self.q_table[
+                    next_inventory,
+                    next_days_left
+                ]
+            )
+
+        # Q-Learning Equation
+        new_q = current_q + self.learning_rate * (
+            reward +
+            self.discount_factor * max_future_q -
+            current_q
+        )
+
+        # Update the Q-Table
+        self.q_table[
+            inventory,
+            days_left,
+            action
+        ] = new_q
+
+        return new_q
 
 
+    # --------------------------------------------------------
+    # Day 4: Training Loop
+    #
+    # The agent interacts with the environment for multiple
+    # episodes. In each episode it:
+    # 1. Resets the environment
+    # 2. Chooses an action
+    # 3. Takes a step
+    # 4. Receives a reward
+    # 5. Updates the Q-table
+    # 6. Continues until the episode ends
+    # --------------------------------------------------------
+# --------------------------------------------------------
+# Train the Q-Learning Agent
+# --------------------------------------------------------
+    def train(
+        self,
+        episodes=3
+    ):
+
+        print("\n========================================")
+        print("Training Started")
+        print("========================================")
+
+        # Clear previous rewards
+        self.reward_history.clear()
+
+        # Loop through each episode
+        for episode in range(episodes):
+
+            # Reset the environment
+            state, info = self.env.reset()
+
+            total_reward = 0
+            steps = 0
+
+            terminated = False
+            truncated = False
+
+            # Continue until the episode ends
+            while not (terminated or truncated):
+
+                # Choose an action
+                action = self.choose_action(state)
+
+                # Take one step in the environment
+                next_state, reward, terminated, truncated, info = self.env.step(action)
+
+                # Update the Q-Table
+                self.update_q_table(
+                    state,
+                    action,
+                    reward,
+                    next_state,
+                    terminated
+                )
+
+                # Move to the next state
+                state = next_state
+
+                # Add reward
+                total_reward += reward
+
+                # Count steps
+                steps += 1
+
+            # Store episode reward
+            self.reward_history.append(total_reward)
+
+            print("\nEpisode :", episode + 1)
+            print("Steps :", steps)
+            print("Total Reward :", total_reward)
+
+        print("\n========================================")
+        print("Training Completed")
+        print("========================================")
 
 if __name__ == "__main__":
 
@@ -120,6 +251,7 @@ if __name__ == "__main__":
     # Reset Environment
     print("\n2. Environment Reset")
     print("-" * 30)
+
     state, info = agent.env.reset()
 
     print("Current State :", state)
@@ -135,13 +267,53 @@ if __name__ == "__main__":
     print("\nReturned Action :", action)
     print("Selected Price  :", agent.env.price_levels[action])
 
+    # ----------------------------------------
+    # Test Q-Table Update
+    # ----------------------------------------
+
+    print("\n4. Q-Table Update")
+    print("-" * 30)
+
+    next_state, reward, terminated, truncated, info = agent.env.step(action)
+
+    updated_q = agent.update_q_table(
+        state,
+        action,
+        reward,
+        next_state,
+        terminated
+    )
+
+    print("\nCurrent State :", state)
+    print("Selected Action :", action)
+    print("Reward :", reward)
+    print("Next State :", next_state)
+
+    print("\nUpdated Q-Value :", updated_q)
+
+    inventory, days_left = state
+
+    print("Stored Q-Value :",
+          agent.q_table[
+              inventory,
+              days_left,
+              action
+          ])
+
+    
+ # ----------------------------------------
+# Training Loop
+# ----------------------------------------
+
+# ----------------------------------------
+# Training Loop
+# ----------------------------------------
+
+    print("\n5. Training Loop")
+    print("-" * 30)
+
+    agent.train(episodes=3)
+
     print("\n" + "=" * 45)
     print("Q-Learning Agent Tested Successfully")
     print("=" * 45)
-
-
-
-
-
-
-    
