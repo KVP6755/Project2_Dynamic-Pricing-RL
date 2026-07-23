@@ -171,3 +171,71 @@ def train_agent(agent, total_episodes=TOTAL_EPISODES):
     all_step_logs_df = pd.DataFrame(all_step_logs)
 
     return training_history, all_step_logs_df
+
+
+
+# 5. Save results 
+
+def save_training_results(training_history, step_logs,
+                          history_path='training_history.csv',
+                          steps_path='step_logs.csv'):
+  
+    training_history.to_csv(history_path, index=False)
+    step_logs.to_csv(steps_path, index=False)
+    print(f"Training history saved : {history_path}")
+    print(f"Step logs saved        : {steps_path}")
+
+
+# 6. Training summary
+
+def print_training_summary(training_history):
+    """Prints a summary of training performance."""
+    print("\n" + "=" * 50)
+    print("TRAINING SUMMARY")
+    print("=" * 50)
+    print(f"Total episodes      : {len(training_history)}")
+    print(f"Best episode reward : ₹{training_history['total_reward'].max():,.2f}")
+    print(f"Worst episode reward: ₹{training_history['total_reward'].min():,.2f}")
+    print(f"Average reward      : ₹{training_history['total_reward'].mean():,.2f}")
+    print(f"Final avg (last 50) : ₹{training_history['avg_reward_50'].iloc[-1]:,.2f}")
+    print(f"Total revenue earned: ₹{training_history['cumulative_reward'].iloc[-1]:,.2f}")
+
+
+
+# 7. Run everything
+
+if __name__ == "__main__":
+
+    # Import Member 2's Q-Learning agent
+    from q_learning_agent import QLearningAgent
+
+    np.random.seed(RANDOM_STATE)
+
+    # Total states = 101 inventory levels × 31 day levels
+    n_states  = (TOTAL_INVENTORY + 1) * (TOTAL_DAYS + 1)
+    n_actions = len(PRICE_LEVELS)
+
+    # Initialize Q-Learning agent
+    agent = QLearningAgent(
+        n_states      = n_states,
+        n_actions     = n_actions,
+        alpha         = 0.1,
+        gamma         = 0.95,
+        epsilon       = 1.0,
+        epsilon_decay = 0.995,
+        epsilon_min   = 0.01
+    )
+
+    # Train
+    training_history, step_logs = train_agent(
+        agent, total_episodes=TOTAL_EPISODES
+    )
+
+    # Summary
+    print_training_summary(training_history)
+
+    # Save 
+    save_training_results(training_history, step_logs)
+
+    print("\n✓ training_pipeline.py complete.")
+ 
