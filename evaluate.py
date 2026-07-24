@@ -58,3 +58,40 @@ Output Files:
 """
 
 
+# ============================================================
+# IMPORTS
+# ============================================================
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
+
+# ============================================================
+# CONSTANTS
+# ============================================================
+# Must match mdp_design.py and state_action_space.py exactly
+
+PRICE_LEVELS    = [50, 100, 150, 200, 250]
+N_ACTIONS       = len(PRICE_LEVELS)
+TOTAL_INVENTORY = 100
+TOTAL_DAYS      = 30
+RANDOM_STATE    = 42
+
+# Evaluation settings
+N_EVAL_EPISODES = 100    # episodes to run per policy
+PLOTS_DIR       = Path('plots')
+PLOTS_DIR.mkdir(exist_ok=True)
+
+# Styling
+plt.style.use('seaborn-v0_8-darkgrid')
+COLORS = {
+    'dqn'      : '#2ecc71',   # green
+    'qlearning': '#3498db',   # blue
+    'random'   : '#e74c3c'    # red
+}
+
+print("Evaluate.py constants loaded:")
+print(f"  Eval episodes : {N_EVAL_EPISODES}")
+print(f"  Price levels  : {PRICE_LEVELS}")
+print(f"  Plots output  : {PLOTS_DIR}/")
