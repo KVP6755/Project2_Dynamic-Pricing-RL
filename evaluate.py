@@ -277,3 +277,64 @@ if __name__ == "__main__":
         print(f"  {policy:<12}: "
               f"₹{result['total_revenue']:.0f} | "
               f"Sold: {result['rooms_sold']}")
+
+# ============================================================
+# FUNCTION 3: collect_metrics
+# ============================================================
+
+def collect_metrics(agent, n_episodes=N_EVAL_EPISODES):
+    """
+    Run N evaluation episodes and collect metrics for all policies.
+
+    Runs DQN agent and all 3 baselines for fair comparison.
+    Uses the same random seed for all policies so environment
+    randomness doesn't bias the comparison.
+
+    Args:
+        agent      : DQNAgent or MockDQNAgent
+        n_episodes : number of episodes per policy
+
+    Returns:
+        dict: metrics for each policy with lists of episode results
+    """
+    np.random.seed(RANDOM_STATE)
+
+    results = {
+        'dqn'        : [],
+        'random'     : [],
+        'fixed_high' : [],
+        'fixed_low'  : []
+    }
+
+    print("=" * 50)
+    print(f"COLLECTING METRICS — {n_episodes} episodes each")
+    print("=" * 50)
+
+    # Run DQN episodes
+    print(f"Running DQN agent...")
+    for i in range(n_episodes):
+        results['dqn'].append(run_dqn_episode(agent))
+    dqn_mean = np.mean([r['total_revenue'] for r in results['dqn']])
+    print(f"  DQN mean revenue: ₹{dqn_mean:.2f}")
+
+    # Run baseline episodes
+    for policy in ['random', 'fixed_high', 'fixed_low']:
+        print(f"Running {policy} baseline...")
+        for i in range(n_episodes):
+            results[policy].append(run_baseline_episode(policy))
+        mean = np.mean([r['total_revenue'] for r in results[policy]])
+        print(f"  {policy} mean revenue: ₹{mean:.2f}")
+
+    print("=" * 50)
+    print("Metrics collection complete.")
+    print("=" * 50)
+
+    return results
+
+
+def get_revenue_arrays(results):
+    """Extract revenue lists from results dict for plotting."""
+    return {
+        policy: [r['total_revenue'] for r in episodes]
+        for policy, episodes in results.items()
+    }
