@@ -215,4 +215,65 @@ if __name__ == "__main__":
     print(f"  Rooms Sold   : {result['rooms_sold']}")
     print(f"  Rooms Unsold : {result['rooms_unsold']}")
 
-    
+# ============================================================
+# FUNCTION 2: run_baseline_episode
+# ============================================================
+
+def run_baseline_episode(policy='random'):
+    """
+    Run one episode using a naive baseline pricing strategy.
+
+    Three baseline policies for comparison:
+    - 'random'     : random price each day
+    - 'fixed_high' : always ₹250 (maximize margin)
+    - 'fixed_low'  : always ₹50  (maximize volume)
+
+    These are the benchmarks the DQN must beat to prove it
+    learned something meaningful.
+
+    Args:
+        policy (str): 'random', 'fixed_high', or 'fixed_low'
+
+    Returns:
+        dict: {total_revenue, rooms_sold, rooms_unsold, steps}
+    """
+    inventory     = TOTAL_INVENTORY
+    days          = TOTAL_DAYS
+    total_revenue = 0
+    rooms_sold    = 0
+
+    while days > 0 and inventory > 0:
+        if policy == 'random':
+            price = np.random.choice(PRICE_LEVELS)
+        elif policy == 'fixed_high':
+            price = 250
+        elif policy == 'fixed_low':
+            price = 50
+        else:
+            price = np.random.choice(PRICE_LEVELS)
+
+        bookings       = demand_function(price, days)
+        bookings       = min(bookings, inventory)
+        reward         = price * bookings
+
+        total_revenue += reward
+        rooms_sold    += bookings
+        inventory     -= bookings
+        days          -= 1
+
+    return {
+        'total_revenue': total_revenue,
+        'rooms_sold'   : rooms_sold,
+        'rooms_unsold' : inventory,
+        'steps'        : TOTAL_DAYS - days
+    }
+
+
+if __name__ == "__main__":
+    np.random.seed(RANDOM_STATE)
+    print("Baseline policy test:")
+    for policy in ['random', 'fixed_high', 'fixed_low']:
+        result = run_baseline_episode(policy)
+        print(f"  {policy:<12}: "
+              f"₹{result['total_revenue']:.0f} | "
+              f"Sold: {result['rooms_sold']}")
