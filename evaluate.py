@@ -95,3 +95,59 @@ print("Evaluate.py constants loaded:")
 print(f"  Eval episodes : {N_EVAL_EPISODES}")
 print(f"  Price levels  : {PRICE_LEVELS}")
 print(f"  Plots output  : {PLOTS_DIR}/")
+
+# ============================================================
+# MOCK DQN AGENT (placeholder until Member 1 shares dqn_model.py)
+# ============================================================
+# This stub mimics the interface of Member 1's DQNAgent class.
+# When dqn_model.py is ready, replace this block with:
+#     from dqn_model import DQNAgent
+
+class MockDQNAgent:
+    """
+    Placeholder DQN agent — mimics DQNAgent interface from Member 1.
+    Replace with: from dqn_model import DQNAgent
+    when Member 1's file is ready.
+
+    Simulates a slightly-better-than-random pricing policy to
+    allow full evaluation pipeline testing before DQN is trained.
+    """
+    def __init__(self):
+        np.random.seed(RANDOM_STATE)
+        self.name = "DQN Agent (Mock)"
+
+    def select_action(self, state):
+        """
+        Select price action given current state.
+        Mock: prefers mid-range prices (indices 1-3)
+        Real DQN: argmax(Q-values) from neural network
+        """
+        inventory, days = state
+        # Mock smart behavior: high price with lots of days/inventory
+        # low price when running out of time
+        if days > 20:
+            return np.random.choice([2, 3, 4])  # higher prices
+        elif days > 10:
+            return np.random.choice([1, 2, 3])  # mid prices
+        else:
+            return np.random.choice([0, 1, 2])  # lower prices to clear
+
+
+# ============================================================
+# DEMAND FUNCTION (from mdp_design.py Week 1)
+# ============================================================
+
+def demand_function(price, days_remaining):
+    """
+    Stochastic customer demand — same formula as Week 1 mdp_design.py.
+    Kept here so evaluate.py is self-contained for testing.
+    """
+    BASE_DEMAND_RATE  = 0.8
+    PRICE_SENSITIVITY = 0.002
+    URGENCY_FACTOR    = 0.3
+
+    urgency  = URGENCY_FACTOR * (1 / max(days_remaining, 1))
+    prob     = BASE_DEMAND_RATE - PRICE_SENSITIVITY * price + urgency
+    prob     = max(0.0, min(1.0, prob))
+    bookings = np.random.binomial(5, prob)
+    return int(bookings)
