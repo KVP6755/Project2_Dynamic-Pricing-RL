@@ -151,3 +151,68 @@ def demand_function(price, days_remaining):
     prob     = max(0.0, min(1.0, prob))
     bookings = np.random.binomial(5, prob)
     return int(bookings)
+
+# ============================================================
+# FUNCTION 1: run_dqn_episode
+# ============================================================
+
+def run_dqn_episode(agent, verbose=False):
+    """
+    Run one complete evaluation episode using the DQN agent.
+
+    The agent observes the current state, selects a price action,
+    the environment transitions, and reward is collected.
+    Episode ends when days=0 or inventory=0.
+
+    Args:
+        agent   : DQNAgent (or MockDQNAgent) with select_action()
+        verbose : print step-by-step details
+
+    Returns:
+        dict: {total_revenue, rooms_sold, rooms_unsold, steps}
+    """
+    inventory     = TOTAL_INVENTORY
+    days          = TOTAL_DAYS
+    total_revenue = 0
+    rooms_sold    = 0
+
+    if verbose:
+        print(f"\n{'Step':<6}{'State':<18}"
+              f"{'Price':<8}{'Books':<8}{'Reward'}")
+        print("-" * 50)
+
+    while days > 0 and inventory > 0:
+        state         = [inventory, days]
+        action_idx    = agent.select_action(state)
+        price         = PRICE_LEVELS[action_idx]
+        bookings      = demand_function(price, days)
+        bookings      = min(bookings, inventory)
+        reward        = price * bookings
+
+        total_revenue += reward
+        rooms_sold    += bookings
+        inventory     -= bookings
+        days          -= 1
+
+        if verbose:
+            print(f"{TOTAL_DAYS-days:<6}"
+                  f"[{inventory+bookings},{days+1}]"
+                  f"{'':>5}₹{price:<7}{bookings:<8}{reward:.0f}")
+
+    return {
+        'total_revenue': total_revenue,
+        'rooms_sold'   : rooms_sold,
+        'rooms_unsold' : inventory,
+        'steps'        : TOTAL_DAYS - days
+    }
+
+
+if __name__ == "__main__":
+    agent  = MockDQNAgent()
+    result = run_dqn_episode(agent, verbose=True)
+    print(f"\nEpisode result:")
+    print(f"  Total Revenue: ₹{result['total_revenue']:.0f}")
+    print(f"  Rooms Sold   : {result['rooms_sold']}")
+    print(f"  Rooms Unsold : {result['rooms_unsold']}")
+
+    
