@@ -126,3 +126,149 @@ The environment was tested by:
 
 ---
 
+
+
+----------------------------------------------------------------------------------------------------------
+
+
+### Week 2
+
+### Team Role
+**Member 2 – Q-Learning Agent Development**
+
+## Author
+
+**Shilpa S Nair**
+
+---
+
+## Task Description
+
+Implemented the Q-Learning Agent for the Dynamic Pricing Reinforcement Learning project.
+
+The agent interacts with the custom Gymnasium environment, selects pricing actions using the epsilon-greedy strategy, updates the Q-table based on rewards, and learns an optimal pricing policy through multiple training episodes.
+
+---
+
+## Responsibilities Completed
+
+- Created the `QLearningAgent` class.
+- Initialized the Q-table for all state-action pairs.
+- Implemented the epsilon-greedy action selection policy.
+- Implemented the Q-Learning update equation.
+- Developed the multi-episode training loop.
+- Added epsilon decay for balancing exploration and exploitation.
+- Stored rewards obtained in each training episode.
+- Generated a training summary including reward statistics.
+- Separated testing logic into a dedicated test file.
+
+---
+
+## Files Implemented
+
+```
+rl_agent/
+│
+├── q_learning.py
+└── test_q_learning.py
+```
+
+---
+
+## Agent Details
+
+### State
+
+The agent observes the environment state as:
+
+```
+[Remaining Inventory, Days Left]
+```
+
+Example:
+
+```
+[100, 30]
+```
+
+---
+
+### Action Space
+
+Five pricing levels are available:
+
+| Action | Price (₹) |
+|---------|-----------|
+| 0 | 4000 |
+| 1 | 4500 |
+| 2 | 5000 |
+| 3 | 5500 |
+| 4 | 6000 |
+
+---
+
+### Learning Strategy
+
+The Q-Learning agent uses:
+
+- Epsilon-Greedy Action Selection
+- Q-Learning Update Equation
+- Learning Rate
+- Discount Factor
+- Epsilon Decay
+
+to learn the optimal pricing policy over multiple training episodes.
+
+---
+
+### Reward
+
+The reward received from the environment is calculated as:
+
+```
+Reward = Bookings × Selected Price
+```
+
+The agent updates its Q-table using the received reward and the maximum future Q-value.
+
+---
+
+## Technologies Used
+
+- Python
+- NumPy
+- Gymnasium
+- Reinforcement Learning (Q-Learning)
+
+---
+
+## Testing
+
+The Q-Learning agent was tested by:
+
+- Initializing the agent.
+- Resetting the environment.
+- Selecting actions using the epsilon-greedy policy.
+- Updating the Q-table after each action.
+- Running multiple training episodes.
+- Recording episode rewards.
+- Displaying the training summary.
+- Verifying the agent using a separate test file.
+
+---
+
+## Week 2 Status
+
+| Task | Status |
+|------|--------|
+| Create QLearningAgent | ✅ Completed |
+| Initialize Q-Table | ✅ Completed |
+| Implement Epsilon-Greedy Policy | ✅ Completed |
+| Implement Q-Learning Update | ✅ Completed |
+| Develop Training Loop | ✅ Completed |
+| Add Epsilon Decay | ✅ Completed |
+| Store Reward History | ✅ Completed |
+| Generate Training Summary | ✅ Completed |
+| Separate Testing Module | ✅ Completed |
+
+---
