@@ -393,3 +393,74 @@ def plot_reward_comparison(results):
     plt.savefig(path, dpi=150)
     plt.show()
     print(f"Saved: {path}")
+
+# ============================================================
+# FUNCTION 7: generate_performance_summary
+# ============================================================
+
+def generate_performance_summary(results):
+    """
+    Print and return a complete performance report.
+
+    This is the final output of Member 3's evaluation —
+    a clear, numerical answer to "did DQN learn a better policy?"
+
+    Args:
+        results (dict): output from collect_metrics()
+
+    Returns:
+        pd.DataFrame: summary table
+    """
+    revenues = get_revenue_arrays(results)
+
+    policy_labels = {
+        'dqn'       : 'DQN Agent',
+        'random'    : 'Random Policy',
+        'fixed_high': 'Fixed ₹250',
+        'fixed_low' : 'Fixed ₹50'
+    }
+
+    rows = []
+    for policy, rev_list in revenues.items():
+        rows.append({
+            'Policy'          : policy_labels[policy],
+            'Mean Revenue (₹)': round(np.mean(rev_list), 2),
+            'Std Revenue (₹)' : round(np.std(rev_list), 2),
+            'Min Revenue (₹)' : round(np.min(rev_list), 2),
+            'Max Revenue (₹)' : round(np.max(rev_list), 2),
+            'Mean Rooms Sold' : round(np.mean([
+                r['rooms_sold'] for r in results[policy]
+            ]), 1),
+            'Mean Spoilage'   : round(np.mean([
+                r['rooms_unsold'] for r in results[policy]
+            ]), 1)
+        })
+
+    df = pd.DataFrame(rows)
+
+    # Calculate DQN improvement over random baseline
+    dqn_mean    = df[df['Policy']=='DQN Agent'
+                    ]['Mean Revenue (₹)'].values[0]
+    random_mean = df[df['Policy']=='Random Policy'
+                    ]['Mean Revenue (₹)'].values[0]
+    improvement = (dqn_mean / random_mean - 1) * 100
+
+    print("\n" + "=" * 70)
+    print("PERFORMANCE EVALUATION SUMMARY")
+    print("=" * 70)
+    print(df.to_string(index=False))
+    print("=" * 70)
+    print(f"\nDQN vs Random improvement : +{improvement:.1f}%")
+    print(f"DQN mean revenue          : ₹{dqn_mean:.2f}")
+    print(f"Random mean revenue       : ₹{random_mean:.2f}")
+
+    best = df.loc[df['Mean Revenue (₹)'].idxmax(), 'Policy']
+    print(f"\nBest performing policy    : {best}")
+
+    if best == 'DQN Agent':
+        print("✓ DQN OUTPERFORMS ALL BASELINES — Training successful")
+    else:
+        print(f"✗ {best} outperforms DQN — Further training needed")
+    print("=" * 70)
+
+    return df
