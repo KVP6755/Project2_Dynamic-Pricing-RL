@@ -338,3 +338,58 @@ def get_revenue_arrays(results):
         policy: [r['total_revenue'] for r in episodes]
         for policy, episodes in results.items()
     }
+
+# ============================================================
+# FUNCTION 4: plot_reward_comparison
+# ============================================================
+
+def plot_reward_comparison(results):
+    """
+    Plot episode-by-episode revenue for DQN vs all baselines.
+
+    Shows how each policy's revenue varies across 100 episodes —
+    a consistent DQN line above baselines proves it learned
+    a stable, superior pricing policy.
+
+    Args:
+        results (dict): output from collect_metrics()
+    """
+    revenues = get_revenue_arrays(results)
+    episodes = range(1, N_EVAL_EPISODES + 1)
+
+    plt.figure(figsize=(12, 6))
+
+    policy_labels = {
+        'dqn'       : 'DQN Agent',
+        'random'    : 'Random Policy',
+        'fixed_high': 'Fixed ₹250',
+        'fixed_low' : 'Fixed ₹50'
+    }
+    colors = {
+        'dqn'       : '#2ecc71',
+        'random'    : '#e74c3c',
+        'fixed_high': '#e67e22',
+        'fixed_low' : '#3498db'
+    }
+    alphas = {'dqn': 1.0, 'random': 0.6,
+              'fixed_high': 0.6, 'fixed_low': 0.6}
+
+    for policy, rev_list in revenues.items():
+        plt.plot(
+            episodes, rev_list,
+            label=policy_labels[policy],
+            color=colors[policy],
+            alpha=alphas[policy],
+            linewidth=2 if policy == 'dqn' else 1
+        )
+
+    plt.title('Episode Revenue: DQN Agent vs Baseline Policies',
+              fontsize=14, fontweight='bold')
+    plt.xlabel('Episode Number')
+    plt.ylabel('Total Revenue (₹)')
+    plt.legend(loc='upper right')
+    plt.tight_layout()
+    path = PLOTS_DIR / 'reward_comparison.png'
+    plt.savefig(path, dpi=150)
+    plt.show()
+    print(f"Saved: {path}")
