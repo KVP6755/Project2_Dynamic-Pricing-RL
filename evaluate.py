@@ -395,6 +395,105 @@ def plot_reward_comparison(results):
     print(f"Saved: {path}")
 
 # ============================================================
+# FUNCTION 5: plot_revenue_bar_chart
+# ============================================================
+
+def plot_revenue_bar_chart(results):
+    """
+    Bar chart comparing MEAN revenue across all policies.
+
+    This is the clearest visual proof of DQN superiority —
+    one bar per policy, DQN bar should be tallest.
+    """
+    revenues = get_revenue_arrays(results)
+
+    labels = ['DQN Agent', 'Random', 'Fixed ₹250', 'Fixed ₹50']
+    means  = [
+        np.mean(revenues['dqn']),
+        np.mean(revenues['random']),
+        np.mean(revenues['fixed_high']),
+        np.mean(revenues['fixed_low'])
+    ]
+    stds   = [
+        np.std(revenues['dqn']),
+        np.std(revenues['random']),
+        np.std(revenues['fixed_high']),
+        np.std(revenues['fixed_low'])
+    ]
+    colors = ['#2ecc71', '#e74c3c', '#e67e22', '#3498db']
+
+    plt.figure(figsize=(9, 6))
+    bars = plt.bar(labels, means, color=colors,
+                   yerr=stds, capsize=5, edgecolor='white')
+
+    for bar, mean in zip(bars, means):
+        plt.text(bar.get_x() + bar.get_width()/2,
+                 bar.get_height() + 100,
+                 f'₹{mean:.0f}',
+                 ha='center', fontweight='bold', fontsize=11)
+
+    plt.title('Mean Episode Revenue Comparison (100 Episodes)',
+              fontsize=14, fontweight='bold')
+    plt.ylabel('Mean Total Revenue (₹)')
+    plt.tight_layout()
+    path = PLOTS_DIR / 'revenue_bar_chart.png'
+    plt.savefig(path, dpi=150)
+    plt.show()
+    print(f"Saved: {path}")
+
+
+# ============================================================
+# FUNCTION 6: plot_rooms_comparison
+# ============================================================
+
+def plot_rooms_comparison(results):
+    """
+    Compare rooms sold vs rooms unsold (spoilage) per policy.
+
+    Unsold rooms = pure revenue loss. A smart DQN should
+    minimize spoilage while maximizing revenue per booking.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    policy_labels = {
+        'dqn': 'DQN', 'random': 'Random',
+        'fixed_high': '₹250', 'fixed_low': '₹50'
+    }
+    colors = ['#2ecc71', '#e74c3c', '#e67e22', '#3498db']
+
+    sold_means   = [np.mean([r['rooms_sold']
+                    for r in results[p]])
+                    for p in results]
+    unsold_means = [np.mean([r['rooms_unsold']
+                    for r in results[p]])
+                    for p in results]
+    labels       = list(policy_labels.values())
+
+    axes[0].bar(labels, sold_means, color=colors)
+    axes[0].set_title('Mean Rooms Sold per Episode',
+                      fontweight='bold')
+    axes[0].set_ylabel('Rooms Sold')
+    for i, v in enumerate(sold_means):
+        axes[0].text(i, v+0.5, f'{v:.1f}',
+                     ha='center', fontweight='bold')
+
+    axes[1].bar(labels, unsold_means, color=colors)
+    axes[1].set_title('Mean Rooms Unsold (Spoilage)',
+                      fontweight='bold')
+    axes[1].set_ylabel('Rooms Unsold')
+    for i, v in enumerate(unsold_means):
+        axes[1].text(i, v+0.5, f'{v:.1f}',
+                     ha='center', fontweight='bold')
+
+    plt.suptitle('Inventory Management: Sold vs Unsold',
+                 fontsize=13, fontweight='bold')
+    plt.tight_layout()
+    path = PLOTS_DIR / 'rooms_sold_comparison.png'
+    plt.savefig(path, dpi=150)
+    plt.show()
+    print(f"Saved: {path}")
+
+# ============================================================
 # FUNCTION 7: generate_performance_summary
 # ============================================================
 
