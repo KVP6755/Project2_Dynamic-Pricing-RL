@@ -464,3 +464,43 @@ def generate_performance_summary(results):
     print("=" * 70)
 
     return df
+
+# ============================================================
+# MAIN — Full Evaluation Pipeline
+# ============================================================
+
+if __name__ == "__main__":
+
+    print("\n>>> STARTING FULL EVALUATION PIPELINE\n")
+
+    # Step 1: Initialize agent
+    # When Member 1's dqn_model.py is ready, replace with:
+    # from dqn_model import DQNAgent
+    # agent = DQNAgent()
+    # agent.load('models/dqn_trained.pth')
+    agent = MockDQNAgent()
+    print(f"Agent loaded: {agent.name}")
+
+    # Step 2: Collect metrics
+    results = collect_metrics(agent, n_episodes=N_EVAL_EPISODES)
+
+    # Step 3: Generate all plots
+    print("\n>>> GENERATING PLOTS")
+    plot_reward_comparison(results)
+    plot_revenue_bar_chart(results)
+    plot_rooms_comparison(results)
+
+    # Step 4: Performance summary
+    summary_df = generate_performance_summary(results)
+
+    # Step 5: Save summary to CSV
+    summary_df.to_csv('evaluation_summary.csv', index=False)
+    print("\nSaved: evaluation_summary.csv")
+
+    print("\n>>> EVALUATION COMPLETE")
+    print(f"Plots saved to: {PLOTS_DIR}/")
+    print("Files generated:")
+    print("  plots/reward_comparison.png")
+    print("  plots/revenue_bar_chart.png")
+    print("  plots/rooms_sold_comparison.png")
+    print("  evaluation_summary.csv")
