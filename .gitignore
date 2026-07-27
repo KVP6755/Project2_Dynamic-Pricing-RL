@@ -216,5 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+Vishnupriyan
 src/hyperparameter_experiments.csv
 src/performance_summary.csv
+=======
+.idea/
+ main
