@@ -25,8 +25,10 @@ The agent was evaluated over extended training episodes. It successfully learned
 Project2_Dynamic-Pricing-RL/
 │
 └── src/
-    ├── baseline_pricing.ipynb   # Rule-based static pricing logic & baseline setup
-    └── training_analysis.ipynb   # Q-Learning pipeline, visualization, & metric evaluation
+    ├── baseline_pricing.ipynb          # Rule-based static pricing & baseline setup
+    ├── training_analysis.ipynb         # Q-Learning training analysis & visualization
+    ├── hyperparameter_tuning.ipynb     # DQN hyperparameter optimization
+    └── price_trajectory_analysis.ipynb # Price trajectory & performance visualization
 ```
 
 ---
@@ -45,17 +47,25 @@ Project2_Dynamic-Pricing-RL/
   * **Episode vs. Reward:** Track agent learning convergence.
   * **Revenue Comparison:** Real-time line chart mapping Q-learning performance fluctuations directly against the red baseline marker.
 
+### 3. DQN Hyperparameter Tuning
+
+- Located in `src/hyperparameter_tuning.ipynb`.
+- Evaluated multiple DQN hyperparameter configurations.
+- Tuned learning rate, batch size, discount factor (gamma), epsilon decay, and target network update frequency.
+- Compared average reward, training loss, and execution time across experiments.
+- Identified the optimal hyperparameter configuration for improved policy learning.
+- Saved experiment results for further analysis.
+
 ---
 
-## 💻 How to Run
+### 4. Price Trajectory & Performance Visualization
 
-1. Activate your virtual environment:
-   ```bash
-   # Windows
-   .venv\Scripts\activate
-   ```
-2. Navigate to the codebase folder and open the notebooks via VS Code or Jupyter Labs:
-   ```bash
-   cd src
-   ```
-3. Execute `baseline_pricing.ipynb` first to register benchmarks, followed by `training_analysis.ipynb` to train the reinforcement learning model.
+- Located in `src/price_trajectory_analysis.ipynb`.
+- Visualized the dynamic pricing policy learned by the RL agent.
+- Generated price trajectory across training episodes.
+- Compared DQN revenue with the baseline pricing strategy.
+- Analyzed reward trends and occupancy performance.
+- Generated a performance summary report for business evaluation.
+
+---
+
