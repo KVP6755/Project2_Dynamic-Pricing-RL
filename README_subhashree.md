@@ -93,3 +93,42 @@ from state_action_space import (
     TOTAL_STATES, N_ACTIONS
 )
 ```
+---
+
+## Week 3 Contributions — Environment Integration & Evaluation
+
+### File Owned
+`evaluate.py`
+
+### Responsibility
+Integrate DQN agent with PricingEnv, run 100 evaluation
+episodes per policy, compare DQN vs all baselines, generate
+plots and performance summary.
+
+### Functions Built
+| Function | Purpose |
+|---|---|
+| `run_dqn_episode()` | Single DQN agent episode runner |
+| `run_baseline_episode()` | Random/fixed_high/fixed_low baseline |
+| `collect_metrics()` | 100 episodes × all policies |
+| `plot_reward_comparison()` | Episode revenue line chart |
+| `plot_revenue_bar_chart()` | Mean revenue bar chart |
+| `plot_rooms_comparison()` | Rooms sold vs unsold chart |
+| `generate_performance_summary()` | Full evaluation report |
+
+### Results (Mock DQN — updates when real DQN ready)
+| Policy | Mean Revenue | vs Random |
+|---|---|---|
+| DQN Agent | ₹12,237 | +14.4% |
+| Random Policy | ₹10,699 | baseline |
+| Fixed ₹250 | ₹8,500 | -20.6% |
+| Fixed ₹50 | ₹9,800 | -8.4% |
+
+### Plots Generated
+- `plots/reward_comparison.png`
+- `plots/revenue_bar_chart.png`
+- `plots/rooms_sold_comparison.png`
+
+### Note
+MockDQNAgent used until Member 1 shares dqn_model.py.
+Swap 2 lines in main block to plug in real DQN instantly.
