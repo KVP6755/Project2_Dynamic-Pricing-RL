@@ -271,4 +271,140 @@ The Q-Learning agent was tested by:
 | Generate Training Summary | ✅ Completed |
 | Separate Testing Module | ✅ Completed |
 
+
+
+----------------------------------------------------------------------------------------------------------
+
+### Week 3
+
+### Team Role
+**Member 1 – DQN Model Development**
+
+
+---
+
+## Task Description
+
+Implemented the Deep Q-Network (DQN) model for the Dynamic Pricing Reinforcement Learning project.
+
+The DQN agent uses a deep neural network to estimate Q-values for pricing actions, follows an epsilon-greedy strategy for action selection, and utilizes a target network to improve training stability.
+
+---
+
+## Responsibilities Completed
+
+- Created the `DQNModel` class.
+- Designed the Deep Q-Network (DQN) architecture.
+- Implemented the epsilon-greedy action selection policy.
+- Configured exploration parameters (epsilon, epsilon decay, epsilon minimum).
+- Created a separate target network.
+- Implemented target network synchronization.
+- Tested model initialization and action selection.
+- Verified target network updates.
+
+---
+
+## Files Implemented
+
+```
+dqn/
+│
+└── dqn_model.py
+```
+
+---
+
+## Model Details
+
+### State
+
+The DQN agent receives the environment state as:
+
+```
+[Remaining Inventory, Days Left]
+```
+
+Example:
+
+```
+[100, 30]
+```
+
+---
+
+### Action Space
+
+Five pricing levels are available:
+
+| Action | Price (₹) |
+|---------|-----------|
+| 0 | 4000 |
+| 1 | 4500 |
+| 2 | 5000 |
+| 3 | 5500 |
+| 4 | 6000 |
+
+---
+
+### Neural Network Architecture
+
+The Deep Q-Network consists of:
+
+- Input Layer (2 Features)
+- Hidden Layer (64 Neurons, ReLU)
+- Hidden Layer (64 Neurons, ReLU)
+- Output Layer (5 Actions, Linear Activation)
+
+---
+
+### Exploration Strategy
+
+The DQN agent uses the Epsilon-Greedy policy:
+
+- Random action selection during exploration.
+- Best predicted action during exploitation.
+- Epsilon decay to gradually reduce exploration over time.
+
+---
+
+### Target Network
+
+A separate Target Network is maintained to improve learning stability by periodically copying the weights from the main DQN network.
+
+---
+
+## Technologies Used
+
+- Python
+- TensorFlow
+- Keras
+- NumPy
+- Deep Reinforcement Learning (DQN)
+
+---
+
+## Testing
+
+The DQN implementation was tested by:
+
+- Initializing the DQN model.
+- Verifying the neural network architecture.
+- Testing epsilon-greedy action selection.
+- Synchronizing the target network.
+- Validating successful execution of all implemented components.
+
+---
+
+## Week 3 Status
+
+| Task | Status |
+|------|--------|
+| Create DQN Model | ✅ Completed |
+| Design Neural Network | ✅ Completed |
+| Implement Epsilon-Greedy Policy | ✅ Completed |
+| Configure Exploration Parameters | ✅ Completed |
+| Create Target Network | ✅ Completed |
+| Synchronize Target Network | ✅ Completed |
+| Model Testing | ✅ Completed |
+
 ---
