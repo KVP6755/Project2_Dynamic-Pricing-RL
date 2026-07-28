@@ -1,0 +1,5 @@
+Policy,Mean Revenue (₹),Std Revenue (₹),Min Revenue (₹),Max Revenue (₹),Mean Rooms Sold,Mean Spoilage
+DQN Agent,10934.5,889.71,8850,13250,81.3,18.7
+Random Policy,10623.0,975.51,7950,12800,80.7,19.3
+Fixed ₹250,12670.0,1357.33,9500,17750,50.7,49.3
+Fixed ₹50,4996.5,26.7,4750,5000,99.9,0.1
