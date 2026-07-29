@@ -1,9 +1,5 @@
 """
 Project 2 Week 3: DQN Training Pipeline
-=========================================
-Member 2: Develops the full DQN training pipeline,
-connecting the replay buffer with Member 1's TensorFlow
-DQN model and the MDP environment.
 
 Author  : Varnika Valliammai V
 File    : train_dqn.py
@@ -33,15 +29,15 @@ from mdp.mdp_design import (
 )
 
 # 1. Training Configuration
-# ─────────────────────────────────────────
+
 CONFIG = {
-    'total_episodes'     : 500,
-    'batch_size'         : 32,
-    'gamma'              : 0.95,
-    'learning_rate'      : 0.001,
-    'buffer_capacity'    : 10000,
-    'target_update_freq' : 10,
-    'random_state'       : 42
+    'total_episodes': 500,
+    'batch_size': 16,
+    'gamma': 0.95,
+    'learning_rate': 0.001,
+    'buffer_capacity': 10000,
+    'target_update_freq': 10,
+    'random_state': 42
 }
 
 # Member 1 uses raw [inventory, days] as state
@@ -50,9 +46,9 @@ STATE_SIZE  = 2
 N_ACTIONS   = len(PRICE_LEVELS)
 
 
-# ─────────────────────────────────────────
+
 # 2. State preparation
-# ─────────────────────────────────────────
+
 def prepare_state(inventory, days):
     """
     Converts inventory and days into a numpy array
@@ -127,9 +123,8 @@ def train_step(dqn, buffer, batch_size=32, gamma=0.95):
     return history.history['loss'][0]
 
 
-# ─────────────────────────────────────────
 # 4. Full Training Loop
-# ─────────────────────────────────────────
+
 def train_dqn(config=CONFIG):
     """
     Full DQN training pipeline using Member 1's model.
@@ -164,6 +159,7 @@ def train_dqn(config=CONFIG):
 
     episode_rewards = []
     episode_losses  = []
+    step_logs = []
 
     print("=" * 55)
     print(f"STARTING DQN TRAINING: {config['total_episodes']} episodes")
@@ -192,6 +188,19 @@ def train_dqn(config=CONFIG):
             next_inventory = next_raw[0]
             next_days      = next_raw[1]
             next_state     = prepare_state(next_inventory, next_days)
+                       
+            # Log this environment step
+            step_logs.append({
+            "episode": episode,
+            "day": TOTAL_DAYS - days + 1,
+            "inventory": inventory,
+            "days_left": days,
+            "action": action,
+            "price": PRICE_LEVELS[action],
+            "bookings": info["bookings_made"],
+            "reward": reward
+   })
+             
 
             # Store experience in replay buffer
             buffer.push(state, action, reward, next_state, done)
@@ -247,27 +256,32 @@ def train_dqn(config=CONFIG):
         'avg_reward_50'    : pd.Series(episode_rewards)
                              .rolling(50, min_periods=1).mean()
     })
+    step_logs_df = pd.DataFrame(step_logs)
 
-    return dqn, training_history
+    return dqn, training_history, step_logs_df
 
 
-# ─────────────────────────────────────────
+
 # 5. Save and Load Model
-# ─────────────────────────────────────────
-def save_model(dqn, training_history,
-               model_path='dqn_trained_model.keras',
-               history_path='dqn_training_history.csv'):
-    """
-    Saves trained DQN model and training history.
-    Member 3 and Member 4 load these for evaluation.
 
-    Uses .keras format (TensorFlow native format).
-    """
+def save_model(
+    dqn,
+    training_history,
+    step_logs,
+    model_path="dqn_trained_model.keras",
+    history_path="dqn_training_history.csv",
+    step_logs_path="step_logs.csv"
+):
+
     dqn.model.save(model_path)
+
     training_history.to_csv(history_path, index=False)
+
+    step_logs.to_csv(step_logs_path, index=False)
 
     print(f"Model saved   : {model_path}")
     print(f"History saved : {history_path}")
+    print(f"Step logs saved : {step_logs_path}")
 
 
 def load_model(model_path='dqn_trained_model.keras'):
@@ -280,9 +294,8 @@ def load_model(model_path='dqn_trained_model.keras'):
     return model
 
 
-# ─────────────────────────────────────────
 # 6. Training Summary
-# ─────────────────────────────────────────
+
 def print_training_summary(training_history):
     """Prints DQN training performance summary."""
     print("\n" + "=" * 50)
@@ -295,18 +308,18 @@ def print_training_summary(training_history):
     print(f"Final avg loss      : {training_history['avg_loss'].iloc[-1]:.4f}")
 
 
-# ─────────────────────────────────────────
+
 # 7. Run everything
-# ─────────────────────────────────────────
+
 if __name__ == "__main__":
 
     # Train DQN
-    dqn, training_history = train_dqn(CONFIG)
+    dqn, training_history, step_logs_df = train_dqn(CONFIG)
 
     # Print summary
     print_training_summary(training_history)
 
     # Save for teammates
-    save_model(dqn, training_history)
+    save_model(dqn, training_history, step_logs_df)
 
     print("\n✓ train_dqn.py complete.")
