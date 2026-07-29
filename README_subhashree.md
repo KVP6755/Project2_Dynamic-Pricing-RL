@@ -132,3 +132,44 @@ plots and performance summary.
 ### Note
 MockDQNAgent used until Member 1 shares dqn_model.py.
 Swap 2 lines in main block to plug in real DQN instantly.
+
+
+---
+
+## Week 4 Contributions — Policy Evaluation
+
+### File Owned
+`policy_evaluation.ipynb`
+
+### Responsibility
+Evaluate the trained DQN agent against 3 baseline policies
+across 100 simulated booking seasons and produce a complete
+performance comparison report.
+
+### Policies Compared
+| Policy | Description |
+|---|---|
+| DQN Agent | Learned dynamic pricing strategy |
+| Random | Random price each day |
+| Fixed ₹250 | Always premium price |
+| Fixed ₹50 | Always discount price |
+
+### Results (100 episodes)
+| Policy | Mean Revenue | vs Random |
+|---|---|---|
+| DQN Agent | ₹12,237 | +14.4% |
+| Random | ₹10,699 | baseline |
+| Fixed ₹250 | ₹12,670 | +5.7% |
+| Fixed ₹50 | ₹4,997 | -53.3% |
+
+### Metrics Calculated
+- Average episode revenue per policy
+- Cumulative revenue across 100 episodes
+- Revenue improvement % vs each baseline
+- Rooms sold and unsold (spoilage) per policy
+- DQN price trajectory for a sample episode
+
+### Plots Generated
+- `plots/cumulative_reward.png`
+- `plots/avg_revenue_comparison.png`
+- `plots/price_trajectory_sample.png`
